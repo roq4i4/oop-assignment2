@@ -1,3 +1,6 @@
+#ifndef MEMORY_H
+#define MEMORY_H
+
 #include <iostream>
 #include <string>
 using namespace std;
@@ -16,3 +19,5 @@ class Memory {
     void DisplayScreen(ostream out);
     void Reset();
 };
+
+#endif

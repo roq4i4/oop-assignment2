@@ -1,3 +1,6 @@
+#ifndef CPU_H
+#define CPU_H
+
 #include <iostream>
 #include <Memory.cpp>
 using namespace std;
@@ -23,3 +26,5 @@ class CPU {
     StepResult Step();
     void Reset();
 };
+
+#endif

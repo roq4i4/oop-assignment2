@@ -1,0 +1,9 @@
+#include "Machine.h"
+
+int main()
+{
+    Machine machine;
+    machine.ShowMenu();
+
+    return 0;
+}

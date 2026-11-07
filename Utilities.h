@@ -1,17 +1,25 @@
-#include <iostream>
+#ifndef UTILITIES_H
+#define UTILITIES_H
+
 #include <string>
-#include <fstream>
-#include <Memory.cpp>
+#include <vector>
+#include "Memory.h"
+
 using namespace std;
 
-class Utils{
-    public:
-    static int HexToDec(string hex);
-    static string DecToHex(int dec, int width);
-    static bool  IsValidHex(string hex, int width);
+class Utils {
+public:
+    static int HexToDec(string s);
+    static string DecToHex(int value, int width);
+    static bool IsValidHex(string s, int expectedLen);
 };
-class ProgramLoader{
-    bool IsValidProgram(string filename);
-    public:
-    void LoadProgram(string filename, int startAddress, Memory &memory);
+
+class ProgramLoader {
+public:
+    static string LoadFile(string filename, int startAddr, Memory& mem);
+
+private:
+    static string ParseFile(string filename, vector<int>& words);
 };
+
+#endif

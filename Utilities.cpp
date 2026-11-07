@@ -1,66 +1,98 @@
 #include "Utilities.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <iomanip>
+#include <algorithm>
+#include <cctype>
 
-int Utils::HexToDec(string hex)
-{
-    int dec = 0;
-    for (char c : hex) {
-        dec *= 16;
-        if (c >= '0' && c <= '9') {
-            dec += c - '0';
-        } else if (c >= 'A' && c <= 'F') {
-            dec += c - 'A' + 10;
-        } else if (c >= 'a' && c <= 'f') {
-            dec += c - 'a' + 10;
-        }
+using namespace std;
+
+// Converts hexadecimal string to decimal
+int Utils::HexToDec(string s) {
+    int result = 0;
+
+    for (char c : s) {
+        result *= 16;
+
+        if (c >= '0' && c <= '9')
+            result += c - '0';
+        else if (c >= 'A' && c <= 'F')
+            result += c - 'A' + 10;
+        else if (c >= 'a' && c <= 'f')
+            result += c - 'a' + 10;
     }
-    return dec;
+
+    return result;
 }
 
-string Utils::DecToHex(int dec, int width)
-{
-    string hex = "";
-    if (dec == 0) {
-        hex = "0";
-    } else {
-        while (dec > 0) {
-            int remainder = dec % 16;
-            if (remainder < 10) {
-                hex = char(remainder + '0') + hex;
-            } else {
-                hex = char(remainder - 10 + 'A') + hex;
-            }
-            dec /= 16;
-        }
-    }
-    while (hex.length() < width) {
-        hex = "0" + hex;
-    }
-    return hex;
+// Converts decimal value to hexadecimal string
+string Utils::DecToHex(int value, int width) {
+    stringstream ss;
+
+    ss << uppercase << hex
+       << setw(width) << setfill('0') << value;
+
+    return ss.str();
 }
 
-
-bool Utils::IsValidHex(string hex, int width)
-{
-    if (hex.length() != width) {
+// Checks if a string contains valid hexadecimal characters
+bool Utils::IsValidHex(string s, int expectedLen) {
+    if (s.length() != expectedLen)
         return false;
-    }
-    for (char c : hex) {
-        if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'))) {
+
+    for (char c : s) {
+        if (!isxdigit(static_cast<unsigned char>(c)))
             return false;
+    }
+
+    return true;
+}
+
+// Reads and parses the program file
+string ProgramLoader::ParseFile(string filename, vector<int>& words) {
+    ifstream file(filename);
+
+    if (!file.is_open())
+        return "Error: Cannot open file.";
+
+    string line;
+
+    while (getline(file, line)) {
+        // Remove comments
+        size_t commentPos = line.find(';');
+
+        if (commentPos != string::npos)
+            line = line.substr(0, commentPos);
+
+        stringstream ss(line);
+        string word;
+
+        while (ss >> word) {
+            if (!Utils::IsValidHex(word, 4))
+                return "Error: Invalid instruction: " + word;
+
+            words.push_back(Utils::HexToDec(word));
         }
     }
-    return true;
+
+    file.close();
+
+    return "";
 }
 
-bool ProgramLoader::IsValidProgram(string filename)
-{
-    ifstream file(filename);
-    if (!file.is_open()) {
-        return false;
+// Loads program words into memory
+string ProgramLoader::LoadFile(string filename, int startAddr, Memory& mem) {
+    vector<int> words;
+
+    string error = ParseFile(filename, words);
+
+    if (!error.empty())
+        return error;
+
+    for (int i = 0; i < words.size(); i++) {
+        mem.write(startAddr + i, words[i]);
     }
-    return true;
-}
 
-void ProgramLoader::LoadProgram(string filename, int startAddress, Memory &memory)
-{
+    return "";
 }
