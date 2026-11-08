@@ -2,7 +2,7 @@
 #define CPU_H
 
 #include <iostream>
-#include <Memory.cpp>
+#include "Memory.cpp"
 using namespace std;
 
 enum class StepResult { OK, HALTED, INVALID_INSTRUCTION, PC_OUT_OF_RANGE };
@@ -18,6 +18,7 @@ class CPU {
     bool Decode();
     void Execute();
     public:
+    bool IsHalted();
     int GetPC();
     void SetPC(int pc);
     string GetIR();

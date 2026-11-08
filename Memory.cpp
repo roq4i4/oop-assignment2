@@ -48,9 +48,9 @@ void Memory::DisplayRegisters(ostream out)
     }
 }
 
-void Memory::DisplayScreen(ostream out)
+void Memory::DisplayScreen()
 {
-    out << screenBuffer;
+    cout << screenBuffer;
 }
 
 void Memory::Reset()

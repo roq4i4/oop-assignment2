@@ -91,7 +91,7 @@ string ProgramLoader::LoadFile(string filename, int startAddr, Memory& mem) {
         return error;
 
     for (int i = 0; i < words.size(); i++) {
-        mem.write(startAddr + i, words[i]);
+        mem.SetCell(startAddr + i, words[i]);
     }
 
     return "";

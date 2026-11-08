@@ -16,7 +16,7 @@ class Memory {
     void SetScreenBuffer(string buffer);
     void DisplayMemory(ostream out, int pc);
     void DisplayRegisters(ostream out);
-    void DisplayScreen(ostream out);
+    void DisplayScreen();
     void Reset();
 };
 

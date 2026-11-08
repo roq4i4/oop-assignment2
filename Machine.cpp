@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include "Machine.h"
 
 using namespace std;
@@ -8,59 +9,73 @@ Machine::Machine()
     programLoaded = false;
 }
 
-bool Machine::ValidateStartAddress(int addr)
+int Machine::ReadHexInput(string prompt, int minVal, int maxVal)
 {
-    return addr >= 0 && addr < 255 && addr % 2 == 0;
+    string input;
+    int value;
+
+    while (true)
+    {
+        cout << prompt;
+        cin >> input;
+
+        stringstream ss(input);
+
+        if ((ss >> hex >> value) && value >= minVal && value <= maxVal)
+            return value;
+
+        cout << "Invalid input\n";
+    }
 }
 
-bool Machine::LoadProgramFromFile(string filename, int startAddr)
+void Machine::LoadProgramFromFile()
 {
-    if (!ValidateStartAddress(startAddr))
+    string filename;
+
+
+    cout << "File name: ";
+    cin >> filename;
+
+    int addr = ReadHexInput("Start address (hex): ", 0, 254);
+
+    if (addr % 2 != 0)
     {
         cout << "Invalid start address\n";
-        return false;
+        return;
     }
 
     Reset();
 
-    programLoaded = loader.LoadHexFile(filename, startAddr, memory);
+    programLoaded = loader.LoadHexFile(filename, addr, memory);
 
     if (programLoaded)
     {
-        cpu.SetPC(startAddr);
+        cpu.SetPC(addr);
         cout << "Program loaded successfully\n";
     }
     else
     {
         cout << "Failed to load program\n";
     }
-
-    return programLoaded;
 }
 
-void Machine::OverwriteRegister(int reg, int value)
+void Machine::OverwriteRegister()
 {
-    if (reg >= 0 && reg < 16)
-        regs.Set(reg, value);
-    else
-        cout << "Invalid register\n";
+    int reg = ReadHexInput("Register number (hex): ", 0, 15);
+    int value = ReadHexInput("Value (hex): ", 0, 255);
+
+    cpu.GetRegisters().Set(reg, value);
 }
 
-void Machine::OverwriteMemory(int addr, int value)
+void Machine::OverwriteMemory()
 {
-    if (addr >= 0 && addr < 256)
-        memory.Set(addr, value);
-    else
-        cout << "Invalid address\n";
+    int addr = ReadHexInput("Address (hex): ", 0, 255);
+    int value = ReadHexInput("Value (hex): ", 0, 255);
+
+    memory.Set(addr, value);
 }
 
-void Machine::FetchDecodeExecute()
-{
-    cpu.Fetch(memory);
-    cpu.Execute(decoder, regs, memory, alu);
-}
-
-void Machine::RunStep()
+void Machine::RunProgram(bool stepMode)
 {
     if (!programLoaded)
     {
@@ -68,27 +83,30 @@ void Machine::RunStep()
         return;
     }
 
-    if (cpu.IsHalted())
+    if (stepMode)
     {
-        cout << "Program halted\n";
-        return;
+        if (cpu.IsHalted())
+        {
+            cout << "Program halted\n";
+            return;
+        }
+
+        cpu.Fetch(memory);
+        cpu.Execute(memory);
     }
-
-    FetchDecodeExecute();
-    DisplayState();
-}
-
-void Machine::RunAll()
-{
-    if (!programLoaded)
+    else
     {
-        cout << "Load a program first\n";
-        return;
-    }
+        int steps = 0;
 
-    while (!cpu.IsHalted())
-    {
-        FetchDecodeExecute();
+        while (!cpu.IsHalted() && steps < MAX_STEPS)
+        {
+            cpu.Fetch(memory);
+            cpu.Execute(memory);
+            steps++;
+        }
+
+        if (steps >= MAX_STEPS)
+            cout << "Stopped: reached max steps\n";
     }
 
     DisplayState();
@@ -99,7 +117,7 @@ void Machine::DisplayState()
     cout << "\nPC: " << cpu.GetPC();
     cout << "\nIR: " << cpu.GetIR() << "\n";
 
-    regs.Display();
+    cpu.GetRegisters().Display();
     memory.DisplayScreen();
 }
 
@@ -107,13 +125,7 @@ void Machine::Reset()
 {
     cpu.Reset();
     memory.Reset();
-    regs.Reset();
     programLoaded = false;
-}
-
-void Machine::Shutdown()
-{
-    cout << "Goodbye\n";
 }
 
 void Machine::ShowMenu()
@@ -135,62 +147,30 @@ void Machine::ShowMenu()
         cin >> choice;
 
         if (choice == 1)
-        {
-            string filename;
-            int address;
-
-            cout << "File name: ";
-            cin >> filename;
-
-            cout << "Start address: ";
-            cin >> address;
-
-            LoadProgramFromFile(filename, address);
-        }
+            LoadProgramFromFile();
         else if (choice == 2)
-        {
-            int reg, value;
-
-            cout << "Register number: ";
-            cin >> reg;
-
-            cout << "Value: ";
-            cin >> value;
-
-            OverwriteRegister(reg, value);
-        }
+            OverwriteRegister();
         else if (choice == 3)
-        {
-            int address, value;
-
-            cout << "Address: ";
-            cin >> address;
-
-            cout << "Value: ";
-            cin >> value;
-
-            OverwriteMemory(address, value);
-        }
+            OverwriteMemory();
         else if (choice == 4)
-        {
-            RunAll();
-        }
+            RunProgram(false);
         else if (choice == 5)
         {
-            RunStep();
+            RunProgram(true);
             cin.ignore();
             cin.get();
         }
         else if (choice == 6)
-        {
             DisplayState();
-        }
         else if (choice == 7)
-        {
             Reset();
-        }
 
     } while (choice != 0);
 
-    Shutdown();
+    cout << "Goodbye\n";
+}
+
+void Machine::Run()
+{
+    ShowMenu();
 }

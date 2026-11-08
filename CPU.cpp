@@ -1,4 +1,5 @@
 #include "CPU.h"
+#include "ALU.h"
 #include "Utilities.h"
 void CPU::Fetch()
 {
@@ -76,7 +77,6 @@ bool CPU::Decode()
 void CPU::Execute()
 {
     switch (opcode) {
-        Utils:: HexToDec(string(1, R));
         case '1':
             memory.SetRegister(R, memory.GetCell(Utils::HexToDec(string(1, X) + string(1, Y))));
             break;
@@ -120,7 +120,7 @@ void CPU::Execute()
             break;
         case 'A':
             X = Utils::HexToDec(string(1, X));
-            memory.SetRegister(R, ALU::RotateRight(Utils::DecToHex(memory.GetRegister(R), 2), X));
+            memory.SetRegister(R, ALU::RotateRight(memory.GetRegister(R), X));
             break;
         case 'B':
             if(memory.GetRegister(R) == memory.GetRegister(0)) {
@@ -129,6 +129,12 @@ void CPU::Execute()
             else{}
             break;
     }
+}
+
+bool CPU::IsHalted()
+{
+    if (halted){return true;}
+    else{return false; }
 }
 
 int CPU::GetPC()
