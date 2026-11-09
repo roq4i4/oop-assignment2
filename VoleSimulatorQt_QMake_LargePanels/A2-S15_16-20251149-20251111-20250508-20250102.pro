@@ -7,7 +7,7 @@ TEMPLATE = app
 TARGET = VoleSimulatorQt
 
 SOURCES += \
-    main.cpp \
+    $$quote(A2-S15_16-20251149-20251111-20250508-20250102.cpp) \
     MainWindow.cpp \
     Machine.cpp \
     CPU.cpp \
