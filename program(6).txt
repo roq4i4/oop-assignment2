@@ -1,0 +1,17 @@
+; -------------------------------------------------------------------------
+; Vole Machine Program 
+; Purpose: Load two hexadecimal values (0C and 0A), 
+;          perform the bitwise OR operation and display the result.
+; -------------------------------------------------------------------------
+
+ 
+210C    ; Load hexadecimal 0C into register 1.      
+220A    ; Load hexadecimal 0A into register 2.
+7312    ; OR  registers 1 and 2, then store the result in register 3.
+33FF    ; Display the contents of register 3 on the screen.
+C000    ; Halt the program.
+
+
+
+
+

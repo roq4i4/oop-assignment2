@@ -3,20 +3,24 @@
 
 #include <iostream>
 #include <string>
+#include "Utilities.h"
 using namespace std;
 class Memory {
     int cells[256];
     int registers[16];
     string screenBuffer;
     public:
-    int GetCell(int addr);
+    Memory();
+    string GetCell(int addr);
+    string GetSingleCell(int addr);
     void SetCell(int addr, int value);
-    int GetRegister(int r);
+    void SetSingleCell (int addr, int value);
+    string GetRegister(int r);
     void SetRegister(int r, int value);
     void SetScreenBuffer(string buffer);
-    void DisplayMemory(ostream out, int pc);
-    void DisplayRegisters(ostream out);
-    void DisplayScreen();
+    void DisplayMemory(ostream& out, int pc);
+    void DisplayRegisters(ostream& out);
+    void DisplayScreen(ostream& out);
     void Reset();
 };
 

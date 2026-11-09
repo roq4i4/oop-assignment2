@@ -4,9 +4,8 @@
 
 using namespace std;
 
-Machine::Machine()
+Machine::Machine() : memory(), cpu(memory), programLoaded(false)
 {
-    programLoaded = false;
 }
 
 int Machine::ReadHexInput(string prompt, int minVal, int maxVal)
@@ -16,7 +15,7 @@ int Machine::ReadHexInput(string prompt, int minVal, int maxVal)
 
     while (true)
     {
-        cout << prompt;
+        std::cout << prompt;
         cin >> input;
 
         stringstream ss(input);
@@ -24,7 +23,7 @@ int Machine::ReadHexInput(string prompt, int minVal, int maxVal)
         if ((ss >> hex >> value) && value >= minVal && value <= maxVal)
             return value;
 
-        cout << "Invalid input\n";
+        std::cout << "Invalid input\n";
     }
 }
 
@@ -33,29 +32,34 @@ void Machine::LoadProgramFromFile()
     string filename;
 
 
-    cout << "File name: ";
-    cin >> filename;
+    std::cout << "File name: ";
+    if (! (cin >> filename)){
+        std::cout << "File does not exist\n";
+        return;
+    }
 
     int addr = ReadHexInput("Start address (hex): ", 0, 254);
 
     if (addr % 2 != 0)
     {
-        cout << "Invalid start address\n";
+        std::cout << "Invalid start address\n";
         return;
     }
 
     Reset();
 
-    programLoaded = loader.LoadHexFile(filename, addr, memory);
+    string error = ProgramLoader:: LoadFile(filename, addr, memory);
 
-    if (programLoaded)
+    if (error.empty())
     {
         cpu.SetPC(addr);
-        cout << "Program loaded successfully\n";
+        programLoaded = true;
+        std::cout << "Program loaded successfully\n";
     }
     else
     {
-        cout << "Failed to load program\n";
+        programLoaded = false;
+        std::cout << error << "\n";
     }
 }
 
@@ -64,22 +68,26 @@ void Machine::OverwriteRegister()
     int reg = ReadHexInput("Register number (hex): ", 0, 15);
     int value = ReadHexInput("Value (hex): ", 0, 255);
 
-    cpu.GetRegisters().Set(reg, value);
+    memory.SetRegister(reg, value);
 }
 
 void Machine::OverwriteMemory()
 {
     int addr = ReadHexInput("Address (hex): ", 0, 255);
     int value = ReadHexInput("Value (hex): ", 0, 255);
-
-    memory.Set(addr, value);
+    if (addr == 255){
+        memory.SetSingleCell(addr, value);
+    }
+    else{
+        memory.SetCell(addr, value);
+    }
 }
 
 void Machine::RunProgram(bool stepMode)
 {
     if (!programLoaded)
     {
-        cout << "Load a program first\n";
+        std::cout << "Load a program first\n";
         return;
     }
 
@@ -87,12 +95,23 @@ void Machine::RunProgram(bool stepMode)
     {
         if (cpu.IsHalted())
         {
-            cout << "Program halted\n";
+            std::cout << "Program halted\n";
             return;
         }
 
-        cpu.Fetch(memory);
-        cpu.Execute(memory);
+        StepResult result = cpu.Step();
+        if (result == StepResult::HALTED)
+        {
+            std::cout << "Program halted\n";
+        }
+        else if (result == StepResult::INVALID_INSTRUCTION)
+        {
+            std::cout << cpu.GetErrorMsg() << "\n";
+        }
+        else if (result == StepResult::PC_OUT_OF_RANGE)
+        {
+            std::cout << "Program counter out of range\n";
+        }
     }
     else
     {
@@ -100,25 +119,40 @@ void Machine::RunProgram(bool stepMode)
 
         while (!cpu.IsHalted() && steps < MAX_STEPS)
         {
-            cpu.Fetch(memory);
-            cpu.Execute(memory);
-            steps++;
+            StepResult result = cpu.Step();
+            if (result == StepResult::HALTED)
+            {
+                std::cout << "Program halted\n";
+                break;
+            }
+            else if (result == StepResult::INVALID_INSTRUCTION)
+            {
+                std::cout << cpu.GetErrorMsg() << "\n";
+                break;
+            }
+            else if (result == StepResult::PC_OUT_OF_RANGE)
+            {
+                std::cout << "Program counter out of range\n";
+                break;
+            }
+            steps ++;
         }
-
         if (steps >= MAX_STEPS)
-            cout << "Stopped: reached max steps\n";
+                std::cout << "Stopped: reached max steps\n";
     }
-
     DisplayState();
 }
 
 void Machine::DisplayState()
 {
-    cout << "\nPC: " << cpu.GetPC();
-    cout << "\nIR: " << cpu.GetIR() << "\n";
-
-    cpu.GetRegisters().Display();
-    memory.DisplayScreen();
+    std::cout << "\nPC: " << Utils::DecToHex(cpu.GetPC(), 2) << "\n";
+    std::cout << "\nIR: " << cpu.GetIR() << "\n";
+    std::cout << "\nRegisters:\n";
+    memory.DisplayRegisters(std::cout);
+    std::cout << "\nMemory:\n";
+    memory.DisplayMemory(std::cout, cpu.GetPC());
+    std::cout << "\nScreen:\n";
+    memory.DisplayScreen(std::cout);
 }
 
 void Machine::Reset()

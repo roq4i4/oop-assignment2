@@ -1,0 +1,11 @@
+;--------------------------------------------------------------
+; Program 1:
+; Vole machine program
+; Purpose: gets two number (8 and 10) then adds them
+; Then it prints the answer 18  on the screen
+;--------------------------------------------------------------
+2008      ; Load number 8 to R0
+210A      ; Load number 10 to R1
+5301      ; Add the values in register 0 and 1 then save it in register 3
+33FF      ; Print the value in register 3 on the screen
+C000      ; Halt the program

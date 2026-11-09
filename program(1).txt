@@ -1,0 +1,13 @@
+;==================================================================
+; Vole Machine Program-2
+; Purpose: Load three numbers (02, 03 and 04) into (R0, R1 and R2),
+; calculate their sum (09), and display the result on the screen.
+;==================================================================
+
+2002
+2103
+2204
+5301
+5432
+34FF
+C000

@@ -3,9 +3,10 @@
 
 #include <string>
 #include <vector>
-#include "Memory.h"
 
 using namespace std;
+
+class Memory;
 
 class Utils {
 public:

@@ -1,0 +1,24 @@
+// File with team details and who did which part of the code
+SECTION:       S15, 16
+
+ZIP_FILE:      CS213_A2_Part2_S15, 16_20251149_20251111_20250508_20250102.zip
+
+ID1:           20251149
+NAME1:         Roqaia Mohamed Ismael
+FILES1:        Utilities.h, Utilities.cpp
+
+ID2:           20251111
+NAME2:         George Mina Zakaria
+FILES2:        Machine.h, Machine.cpp, "A2-S15, 16-20251149-20251111-20250508-20250102.cpp"
+
+ID3:           20250508
+NAME3:         Laila Mohamed Abd El-Mohsen
+FILES3:        CPU.h, CPU.cpp, Memory.h, Memory.cpp, GUI
+
+ID4:           20250102
+NAME4:         Ereany Eid Eweda
+FILES4:        ALU.h, ALU.cpp
+
+GITHUB:        https://github.com/roq4i4/oop-assignment2
+VIDEO_DESIGN:  https://youtu.be/2-UUeZFESg8?si=rEcIKeTebyg5VIwT
+VIDEO_GUI:     

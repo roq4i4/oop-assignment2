@@ -3,7 +3,9 @@
 #include "Utilities.h"
 void CPU::Fetch()
 {
-    IR = memory.GetCell(PC) + memory.GetCell(PC + 1);
+    string byte1 = memory.GetSingleCell(PC);
+    string byte2 = memory.GetSingleCell(PC + 1);
+    IR = byte1 + byte2;
     PC += 2;
 }
 
@@ -76,59 +78,86 @@ bool CPU::Decode()
 
 void CPU::Execute()
 {
+    int regR = Utils::HexToDec(string(1, R));
     switch (opcode) {
-        case '1':
-            memory.SetRegister(R, memory.GetCell(Utils::HexToDec(string(1, X) + string(1, Y))));
+        case '1':{
+            int addr = Utils::HexToDec(string(1, X) + string(1, Y));
+            memory.SetRegister(regR, Utils::HexToDec(memory.GetCell(addr)));
             break;
-        case '2':
-            memory.SetRegister(R, Utils::HexToDec(string(1, X) + string(1, Y)));
+        }
+        case '2':{
+            int value = Utils::HexToDec(string(1, X) + string(1, Y));
+            memory.SetRegister(regR, value);
             break;
-        case '3':
+        }
+        case '3':{
             if (Y == 'F'&& X == 'F') {
-                memory.SetScreenBuffer(string(1, memory.GetRegister(R)));
+                memory.SetScreenBuffer(memory.GetRegister(regR));
             } else {
-                memory.SetCell(Utils::HexToDec(string(1, X) + string(1, Y)), memory.GetRegister(R));
+                int addr = Utils::HexToDec(string(1, X) + string(1, Y));
+                memory.SetCell(addr, Utils::HexToDec(memory.GetRegister(regR)));
             }
             break;
-        case '4':
-            memory.SetRegister(X, memory.GetRegister(R));
+        }
+        case '4':{
+            int targetReg = Utils::HexToDec(string(1, X));
+            int sourceReg = Utils::HexToDec(string(1, R));
+            memory.SetRegister(targetReg, Utils::HexToDec(memory.GetCell(sourceReg)));
             break;
-        case '5':
-            X = Utils::HexToDec(string(1, X));
-            Y = Utils::HexToDec(string(1, Y));
-            memory.SetRegister(R, ALU::AddInt(memory.GetRegister(X), memory.GetRegister(Y)));
+        }
+        case '5':{
+            int regX = Utils::HexToDec(string(1, X));
+            int regY = Utils::HexToDec(string(1, Y));
+            memory.SetRegister(regR, ALU::AddInt(Utils::HexToDec(memory.GetRegister(regX)), Utils::HexToDec(memory.GetRegister(regY))));
             break;
-        case '6':
-            X = Utils::HexToDec(string(1, X));
-            Y = Utils::HexToDec(string(1, Y));
-            memory.SetRegister(R, ALU::AddFloat(memory.GetRegister(X), memory.GetRegister(Y)));
+        }
+        case '6':{
+            int regX = Utils::HexToDec(string(1, X));
+            int regY = Utils::HexToDec(string(1, Y));
+            memory.SetRegister(regR, ALU::AddFloat(Utils::HexToDec(memory.GetRegister(regX)), Utils::HexToDec(memory.GetRegister(regY))));
             break;
-        case '7':
-           X = Utils::HexToDec(string(1, X));
-            Y = Utils::HexToDec(string(1, Y));
-            memory.SetRegister(R, ALU::Or(memory.GetRegister(X), memory.GetRegister(Y)));
+        }
+        case '7':{
+            int regX = Utils::HexToDec(string(1, X));
+            int regY = Utils::HexToDec(string(1, Y));
+            memory.SetRegister(regR, ALU::Or(Utils::HexToDec(memory.GetRegister(regX)), Utils::HexToDec(memory.GetRegister(regY))));
             break;
-        case '8':
-            X = Utils::HexToDec(string(1, X));
-            Y = Utils::HexToDec(string(1, Y));
-            memory.SetRegister(R, ALU::And(memory.GetRegister(X), memory.GetRegister(Y)));
+        }
+        case '8':{
+            int regX = Utils::HexToDec(string(1, X));
+            int regY = Utils::HexToDec(string(1, Y));
+            memory.SetRegister(regR, ALU::And(Utils::HexToDec(memory.GetRegister(regX)), Utils::HexToDec(memory.GetRegister(regY))));
             break;
-        case '9':
-            X = Utils::HexToDec(string(1, X));
-            Y = Utils::HexToDec(string(1, Y));
-            memory.SetRegister(R, ALU::Xor(memory.GetRegister(X), memory.GetRegister(Y)));
+        }
+        case '9':{
+            int regX = Utils::HexToDec(string(1, X));
+            int regY = Utils::HexToDec(string(1, Y));
+            memory.SetRegister(regR, ALU::Xor(Utils::HexToDec(memory.GetRegister(regX)), Utils::HexToDec(memory.GetRegister(regY))));
             break;
-        case 'A':
-            X = Utils::HexToDec(string(1, X));
-            memory.SetRegister(R, ALU::RotateRight(memory.GetRegister(R), X));
+        }
+        case 'A':{
+            int times = Utils::HexToDec(string(1, X));
+            memory.SetRegister(regR, ALU::RotateRight(Utils::HexToDec(memory.GetRegister(regR)), times));
             break;
-        case 'B':
-            if(memory.GetRegister(R) == memory.GetRegister(0)) {
+        }
+        case 'B':{
+            if(memory.GetRegister(regR) == memory.GetRegister(0)) {
                 PC = Utils::HexToDec(string(1, X) + string(1, Y));
             }
-            else{}
             break;
+        }
+        case 'C':{
+            halted = true;
+            break;
+        }
     }
+}
+
+CPU::CPU(Memory& mem) : memory(mem)
+{
+    PC = 0;
+    IR = "";
+    halted = false;
 }
 
 bool CPU::IsHalted()
@@ -164,6 +193,9 @@ string CPU::GetErrorMsg()
 
 StepResult CPU::Step()
 {
+    if (halted) {
+        return StepResult::HALTED;
+    }
     Fetch();
     if (!Decode()) {
         if (PC < 0 || PC >= 256) {

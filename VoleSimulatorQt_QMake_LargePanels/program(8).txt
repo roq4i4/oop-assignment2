@@ -1,0 +1,47 @@
+; ------------------------------------------------------------------
+; Vole Machine Program
+; Purpose: 
+;   1. Load values 2 and 4
+;   2. Add them (2 + 4 = 6)
+;   3. Divide result by 3 (6 / 3 = 2)
+;   4. Multiply result by 5 (2 * 5 = 10 -> 0A in Hex)
+;   5. Countdown loop from 5 to 1
+;   6. Output each value to screen (Memory[00])
+;   7. Halt execution
+; ------------------------------------------------------------------
+
+2102    ; Load immediate value 02 into Register 1
+2204    ; Load immediate value 04 into Register 2
+5312    ; Add Register 1 and Register 2, put result (6) in Register 3
+3300    ; Store Register 3 into Memory[00] (Output: 6)
+
+2403    ; Load immediate value 03 into Register 4
+2500    ; Initialize Register 5 with 0 (Quotient counter)
+2601    ; Load constant 1 into Register 6
+7404    ; Negate Register 4 (-3 in two's complement: FD)
+
+5334    ; Reg 3 = Reg 3 + Reg 4 (Subtractions: 6 - 3 = 3)
+5556    ; Reg 5 = Reg 5 + Reg 6 (Count = 1)
+5334    ; Reg 3 = Reg 3 + Reg 4 (3 - 3 = 0)
+5556    ; Reg 5 = Reg 5 + Reg 6 (Count = 2, Result of division)
+3500    ; Store Register 5 into Memory[00] (Output: 2)
+
+2705    ; Load immediate value 05 into Register 7
+2800    ; Initialize Register 8 with 0 (Accumulator)
+5885    ; Reg 8 = Reg 8 + Reg 5 (0 + 2 = 2)
+5885    ; Reg 8 = Reg 8 + Reg 5 (2 + 2 = 4)
+5885    ; Reg 8 = Reg 8 + Reg 5 (4 + 2 = 6)
+5885    ; Reg 8 = Reg 8 + Reg 5 (6 + 2 = 8)
+5885    ; Reg 8 = Reg 8 + Reg 5 (8 + 2 = 10 / 0A Hex)
+3800    ; Store Register 8 into Memory[00] (Output: 10)
+
+2905    ; Load starting loop counter 05 into Register 9
+2A01    ; Load decrement step 01 into Register A
+2B00    ; Load comparison zero 00 into Register B
+
+3900    ; Store Register 9 into Memory[00] (Output current loop value: 5, 4, 3, 2, 1)
+7A0A    ; Negate Register A (-1)
+599A    ; Reg 9 = Reg 9 + Reg A (Decrement counter by 1)
+B922    ; Jump to loop start if Reg 9 != Reg B (Repeat until counter reaches 0)
+
+C000    ; Halt execution

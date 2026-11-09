@@ -1,0 +1,11 @@
+; vole machine sample program 2
+; purpose : load two number multiply the first by 2 ,
+; and subtract the second number from the first after multiplying it,(by adding the two's complement),
+; dispaly the result on screen.
+2106 ;load the first number (06) into register 1
+5211 ;multiply it by 2,R2=R1+R1 (6+6=0C)=12
+2303 ; load the second number (03) into register 3
+24FD ; load the two's complement of -3 (FD) into register 4
+5624 ; R6 = R2 + R4 (12+(-3))= 09
+36FF ; dispaly the result
+C000 ; HALT execution

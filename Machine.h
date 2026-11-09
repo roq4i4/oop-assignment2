@@ -2,9 +2,10 @@
 #define MACHINE_H
 
 #include <string>
-#include "CPU.h"
-#include "Memory.h"
+#include "Utilities.h"
 #include "ALU.h"
+#include "Memory.h"
+#include "CPU.h"
 
 class Machine
 {

@@ -1,0 +1,18 @@
+; ------------------------------------------------------------
+; Vole Machine Program 2
+; Purpose: Swap 1A and 2B without a temp register using XOR,
+; then mask the low nibble of 2B and rotate it to the high nibble.
+; ------------------------------------------------------------
+
+201A   ; R0 = 1A
+212B   ; R1 = 2B
+9001   ; R0 = R0 XOR R1 (31)
+9110   ; R1 = R1 XOR R0 (1A)
+9001   ; R0 = R0 XOR R1 (2B), values are now swapped
+30FF   ; Screen output: R0 (2B)
+31FF   ; Screen output: R1 (1A)
+220F   ; R2 = 0F (mask)
+8302   ; R3 = R0 AND R2 (0B)
+A304   ; Rotate R3 right 4 bits (B0)
+33FF   ; Screen output: R3 (B0)
+C000   ; Halt

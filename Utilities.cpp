@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <cctype>
+#include "Memory.h"
 
 using namespace std;
 
@@ -60,18 +61,30 @@ string ProgramLoader::ParseFile(string filename, vector<int>& words) {
 
     while (getline(file, line)) {
         // Remove comments
+        size_t first = line.find_first_not_of(" \t\n\r");
+        if (first == string::npos)
+            continue;
+        size_t last = line.find_last_not_of(" \t\n\r");
+        line = line.substr(first, (last - first + 1));
+
         size_t commentPos = line.find(';');
-
-        if (commentPos != string::npos)
+        if (commentPos != string::npos){
             line = line.substr(0, commentPos);
-
+            last = line.find_last_not_of(" \t\n\r");
+            if (last != string::npos)
+                line = line.substr(0, last + 1);
+            else
+                continue;
+        }
+        
         stringstream ss(line);
         string word;
 
         while (ss >> word) {
-            if (!Utils::IsValidHex(word, 4))
+            if (!Utils::IsValidHex(word, 4)){
+                file.close();
                 return "Error: Invalid instruction: " + word;
-
+            }
             words.push_back(Utils::HexToDec(word));
         }
     }
@@ -91,8 +104,7 @@ string ProgramLoader::LoadFile(string filename, int startAddr, Memory& mem) {
         return error;
 
     for (int i = 0; i < words.size(); i++) {
-        mem.SetCell(startAddr + i, words[i]);
+        mem.SetCell(startAddr + (i * 2), words[i]);
     }
-
     return "";
 }

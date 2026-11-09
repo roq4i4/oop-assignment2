@@ -1,0 +1,15 @@
+;Vole Machine Program
+;Purpose :
+;Swap the values stored in 2 registers
+;using bitwise 'XOR' operation
+;The XOR trick: a = (a XOR b) XOR b
+;(This works because XOR is reversible and 
+;self-inverse)
+;By applying XOR three times, we swap
+;a and b without a temp.
+2005    ;R0 = 5
+2107    ;R1 = 7
+9201    ;R2 = R0 xor R1 (R2 = 2)
+9002    ;R0 = R0 xor R2 (R0 = 7)
+9112    ;R1 = R1 xor R2 (R1 = 5)
+C000    ;Halt

@@ -1,18 +1,40 @@
 #include "Memory.h"
 
-int Memory::GetCell(int addr)
+Memory::Memory()
 {
-    return cells[addr];
+    Reset();
+}
+
+string Memory::GetCell(int addr)
+{
+    return Utils::DecToHex(cells[addr], 2) + Utils::DecToHex(cells[addr + 1], 2);
+}
+
+string Memory::GetSingleCell(int addr)
+{
+    return Utils::DecToHex(cells[addr], 2);
 }
 
 void Memory::SetCell(int addr, int value)
 {
-    cells[addr] = value;
+    string hexValue = Utils::DecToHex(value, 4);
+    cells[addr] = Utils::HexToDec(hexValue.substr(0, 2));
+    cells[addr + 1] = Utils::HexToDec(hexValue.substr(2, 2));
 }
 
-int Memory::GetRegister(int r)
+void Memory::SetSingleCell(int addr, int value)
 {
-    return registers[r];
+    if (addr >= 0 && addr < 256){
+        cells[addr] = value % 256;
+    }
+    else {
+        std:: cout << "Error: Address Out of Bounds!\n";
+    }
+}
+
+string Memory::GetRegister(int r)
+{
+    return Utils::DecToHex(registers[r], 2);
 }
 
 void Memory::SetRegister(int r, int value)
@@ -25,7 +47,7 @@ void Memory::SetScreenBuffer(string buffer)
     screenBuffer = buffer;
 }
 
-void Memory::DisplayMemory(ostream out, int pc)
+void Memory::DisplayMemory(ostream& out, int pc)
 {
     for (int i = 0; i < 256; i++)
     {
@@ -37,20 +59,20 @@ void Memory::DisplayMemory(ostream out, int pc)
         {
             out << "     ";
         }
-        out << "Cell " << i << ": " << cells[i] << endl;
+        out << "Cell " << Utils::DecToHex(i, 2) << " : " << Utils::DecToHex(cells[i], 2) << endl;
     }
 }
 
-void Memory::DisplayRegisters(ostream out)
+void Memory::DisplayRegisters(ostream& out)
 {
     for (int i = 0; i < 16; i++){
-        out << "R" << i << ": " << registers[i] << endl;
+        out << "R" << Utils::DecToHex(i, 1) << ": " << Utils::DecToHex(registers[i], 2) << endl;
     }
 }
 
-void Memory::DisplayScreen()
+void Memory::DisplayScreen(ostream& out)
 {
-    cout << screenBuffer;
+    out << screenBuffer;
 }
 
 void Memory::Reset()
