@@ -1,8 +1,7 @@
 #include<iostream>
-#include "ALU.h"
 #include<cmath>
 using namespace std;
-
+#include "ALU.h"
 int ALU::AddInt(int a, int b){
     return (a+b)%256;
 }

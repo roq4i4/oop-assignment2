@@ -1,9 +1,9 @@
 ; Vole Machine Program
-; Purpose: Load 8 and 3, subtract them,
+; Purpose: Load 8 and 3, add them,
 ; and display the result (5) on the screen.
 
 2008
 2103
 5301
-3300
+33FF
 C000
