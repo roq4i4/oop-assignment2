@@ -2,7 +2,7 @@
 #define UTILITIES_H
 
 #include <string>
-#include <vector>,
+#include <vector>
 
 using namespace std;
 
