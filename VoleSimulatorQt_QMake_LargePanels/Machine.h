@@ -20,8 +20,8 @@ public:
 
     // Functions used by the graphical interface
     std::string LoadProgram(const std::string& filename, int startAddress);
-    void SetRegisterValue(int reg, int value);
-    void SetMemoryValue(int address, int value);
+    string SetRegisterValue(int reg, int value);
+    string SetMemoryValue(int address, int value);
     std::string RunOneStep();
     std::string RunAllSteps();
     std::string GetRegistersText();

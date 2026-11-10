@@ -63,24 +63,28 @@ void Machine::LoadProgramFromFile()
     }
 }
 
-void Machine::OverwriteRegister()
+string Machine::OverwriteRegister()
 {
     int reg = ReadHexInput("Register number (hex): ", 0, 15);
     int value = ReadHexInput("Value (hex): ", 0, 255);
-
-    memory.SetRegister(reg, value);
+    if (reg >= 0 && reg < 16 && value >= 0 && value <= 255)
+        memory.SetRegister(reg, value);
+    if(reg < 0 || reg >= 16) return "Invalid register address";
+    if(value < 0 && value >= 256) return "Invalid value";
+    return "error";
 }
 
-void Machine::OverwriteMemory()
+string Machine::OverwriteMemory()
 {
     int addr = ReadHexInput("Address (hex): ", 0, 255);
     int value = ReadHexInput("Value (hex): ", 0, 255);
-    if (addr == 255){
+    if (addr >= 0 && addr < 256 && value >= 0 && value <= 255) {
         memory.SetSingleCell(addr, value);
+        return "Memory updated successfully";
     }
-    else{
-        memory.SetCell(addr, value);
-    }
+    if(addr < 0 || addr >= 256) return "Invalid memory address";
+    if(value < 0 && value >= 256) return "Invalid value";
+    return "error";
 }
 
 void Machine::RunProgram(bool stepMode)

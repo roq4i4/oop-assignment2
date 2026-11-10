@@ -42,18 +42,24 @@ std::string Machine::LoadProgram(const std::string& filename, int startAddress)
     return error;
 }
 
-void Machine::SetRegisterValue(int reg, int value)
+string Machine::SetRegisterValue(int reg, int value)
 {
     if (reg >= 0 && reg < 16 && value >= 0 && value <= 255)
         memory.SetRegister(reg, value);
+    if(reg < 0 || reg >= 16) return "Invalid register address";
+    if(value < 0 && value >= 256) return "Invalid value";
+    return "error";
 }
 
-void Machine::SetMemoryValue(int address, int value)
+string Machine::SetMemoryValue(int address, int value)
 {
     if (address >= 0 && address < 256 && value >= 0 && value <= 255) {
-        if (address == 255) memory.SetSingleCell(address, value);
-        else memory.SetCell(address, value);
+        memory.SetSingleCell(address, value);
+        return "Memory updated successfully";
     }
+    if(address < 0 || address >= 256) return "Invalid memory address";
+    if(value < 0 && value >= 256) return "Invalid value";
+    return "Error";
 }
 
 std::string Machine::RunOneStep()

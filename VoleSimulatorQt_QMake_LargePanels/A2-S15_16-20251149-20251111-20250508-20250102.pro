@@ -6,8 +6,9 @@ CONFIG += warn_on
 TEMPLATE = app
 TARGET = VoleSimulatorQt
 
+# The main source file keeps the exact name required by the course.
 SOURCES += \
-    $$quote(A2-S15_16-20251149-20251111-20250508-20250102.cpp) \
+    $$quote(A2-S15, 16-20251149-20251111-20250508-20250102.cpp) \
     MainWindow.cpp \
     Machine.cpp \
     CPU.cpp \
@@ -23,15 +24,5 @@ HEADERS += \
     Memory.h \
     Utilities.h
 
-# Example program files are included in the project folder.
-DISTFILES += \
-    program(1).txt \
-    program(2).txt \
-    program(3).txt \
-    program(4).txt \
-    program(5).txt \
-    program(6).txt \
-    program(7).txt \
-    program(8).txt \
-    program(9).txt \
-    program(10).txt
+# Include all text files in the project folder, including any extra test files.
+DISTFILES += $$files($$PWD/*.txt)

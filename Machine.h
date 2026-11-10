@@ -21,8 +21,8 @@ public:
     void Run();
     void ShowMenu();
     void LoadProgramFromFile();
-    void OverwriteRegister();
-    void OverwriteMemory();
+    string OverwriteRegister();
+    string OverwriteMemory();
     void RunProgram(bool stepMode);
     void DisplayState();
     int ReadHexInput(std::string prompt, int minVal, int maxVal);
